@@ -1,5 +1,10 @@
 package ru.netology.web;
 
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.selenide.AllureSelenide;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
@@ -19,9 +24,20 @@ public class CardDeliveryTest {
     private final String name = getRandomName();
     private final String notCorrectName = getNotCorrectName();
     private final String phone = getRandomPhone();
+    private final String phone2 = getIncorrectPhone();
+
+    @BeforeAll
+    static void setUpAll(){
+        SelenideLogger.addListener("allure", new AllureSelenide());
+    }
+
+    @AfterAll
+    static void tearDownAll(){
+        SelenideLogger.removeListener("allure");
+    }
 
     @BeforeEach
-    void setUpAll() {
+    void setUp() {
         open("http://localhost:9999");
         $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
     }
@@ -161,7 +177,7 @@ public class CardDeliveryTest {
         $("[data-test-id='city'] input").setValue(DataGenerator.getRandomCity());
         $("[data-test-id='date'] input").setValue(DataGenerator.getCorrectDate(3));
         $("[data-test-id='name'] input").setValue(DataGenerator.getRandomName());
-        $("[data-test-id='phone'] input").setValue("+92178955");
+        $("[data-test-id='phone'] input").setValue(phone2);
         $("[data-test-id='agreement']").click();
         $$("button").find(exactText("Запланировать")).click();
         $("[data-test-id=phone].input_invalid .input__sub").shouldHave(exactText("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
